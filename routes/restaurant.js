@@ -10,7 +10,7 @@ router.post('/submit_restaurant',upload.any(), function(req, res, next) {
     // console.log("Files:",req.files)
     try
   { 
-    pool.query("insert into restaurant( restaurantname, ownername, phonenumber, emailid, mobilenumber, url, fssai, gstno, gsttype, filefssai, fileshopact, filelogo, address, stateid, cityid, latlong, password, status, createdat, updatedat) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[
+    pool.query("insert into restaurant( restaurantname, ownername, phonenumber, emailid, mobilenumber, url, fssai, gstno, gsttype, filefssai, fileshopact, filelogo, address, avragecost, stateid, cityid, latlong, password, status, createdat, updatedat) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[
       req.body.restaurantname, 
       req.body.ownername, 
       req.body.phonenumber, 
@@ -23,7 +23,8 @@ router.post('/submit_restaurant',upload.any(), function(req, res, next) {
       req.files[0].filename, 
       req.files[1].filename, 
       req.files[2].filename, 
-      req.body.address, 
+      req.body.address,
+      req.body.avragecost, 
       req.body.stateid, 
       req.body.cityid, 
       req.body.latlong, 
@@ -71,7 +72,7 @@ router.post('/edit_restaurant_data',function(req, res, next) {
      
   try
 { 
-  pool.query("update restaurant set restaurantname=?, ownername=?, phonenumber=?, emailid=?, mobilenumber=?, url=?, fssai=?, gstno=?, gsttype=?, address=?, stateid=?, cityid=?, latlong=?, createdat=?, updatedat=? where restaurantid=?",[
+  pool.query("update restaurant set restaurantname=?, ownername=?, phonenumber=?, emailid=?, mobilenumber=?, url=?, fssai=?, gstno=?, gsttype=?, address=?, avragecost=?, stateid=?, cityid=?, latlong=?, createdat=?, updatedat=? where restaurantid=?",[
     req.body.restaurantname, 
     req.body.ownername, 
     req.body.phonenumber, 
@@ -81,7 +82,8 @@ router.post('/edit_restaurant_data',function(req, res, next) {
     req.body.fssai, 
     req.body.gstno, 
     req.body.gsttype, 
-    req.body.address, 
+    req.body.address,
+    req.body.avragecost, 
     req.body.stateid, 
     req.body.cityid, 
     req.body.latlong,  
@@ -152,5 +154,29 @@ router.post('/edit_restaurant_images',upload.single('picture'),function(req, res
   res.status(500).json({data:[],message:'Critical error, pls contact database administration.....',status:false})
   }
   });
+
+  router.post('/check_resadmin_login', function (req, res, next) {
+    // console.log("try:", req.body)
+    try {
+      pool.query("select * from restaurant where (emailid=? or mobilenumber=?) and password=?",[req.body.emailid,req.body.emailid,req.body.password],function (error, result) {
+        if (error) {
+          res.status(500).json({ data: [], message: 'Database error, pls contact database administration.....', status: false })
+        }
+        else {
+              if(result.length==1)
+                {
+                  var {password,...data}=result[0]  
+                  //console.log("Selected Data:",data)
+                  res.status(200).json({data,message:'Successfull',status:true})
+                }
+              else
+                  res.status(200).json({data:[],message:'Invalid Adminid/Password',status:false})
+        }
+      })
+    }
+    catch (e) {
+      res.status(500).json({ data: [], message: 'Invalid Admin/Password', status: false })
+    }
+})
   
 module.exports = router;

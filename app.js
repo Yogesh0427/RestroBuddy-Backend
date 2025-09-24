@@ -37,7 +37,7 @@ app.use('/subcategory', subcategoryRouter);
 app.use('/food', foodRouter);
 app.use('/time', timeRouter);
 app.use('/admin', adminRouter);
-app.use('./userinterface',userinterfaceRouter);
+app.use('/userinterface',userinterfaceRouter);
 app.use('/pictureinsert', pictureinsertRouter);
 
 // catch 404 and forward to error handler

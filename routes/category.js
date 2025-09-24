@@ -27,10 +27,10 @@ router.post('/submit_category', upload.single("icon"), function (req, res, next)
     res.status(500).json({ data: [], message: 'Critical error, pls contact database administration.....', status: false })
   }
 })
-router.get('/display_all_category',function(req,res,next){
+router.post('/display_all_category',function(req,res,next){
   try
-  {
-    pool.query("select C.*,(select R.restaurantname from restaurant R where R.restaurantid=C.restaurantid)as restaurantname from category C",function(error,result){
+  { console.log(req.body.restaurantid)
+    pool.query("select C.*,(select R.restaurantname from restaurant R where R.restaurantid=C.restaurantid)as restaurantname from category C where C.restaurantid=?",[req.body.restaurantid],function(error,result){
       if(error)
         {
             res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
@@ -46,6 +46,7 @@ router.get('/display_all_category',function(req,res,next){
     res.status(500).json({data:[],message:'Critical error, pls contact database administration.....',status:false})
   }
 })
+
 router.post('/edit_category_data',function(req,res,next){
   //console.log(req.body)
   try
@@ -114,5 +115,25 @@ router.post('/edit_category_image',upload.single('icon'),function(req,res,next){
     {
       res.status(500).json({data:[],message:'Critical error, pls contact database administration.....',status:false})
     }
+})
+
+router.post('/display_all_reviews',function(req,res,next){
+  try
+  {
+    pool.query("select Re.*,(select R.restaurantname from restaurant R where R.restaurantid=Re.restaurantid)as restaurantname from review Re where Re.restaurantid=13",[req.body.restaurantid],function(error,result){
+      if(error)
+        {
+            res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
+        }
+        else
+        {
+            res.status(200).json({data:result,message:'Successful....',status:true})
+        }
+    })
+  }
+  catch(e)
+  {
+    res.status(500).json({data:[],message:'Critical error, pls contact database administration.....',status:false})
+  }
 })
 module.exports = router;

@@ -4,10 +4,10 @@ var pool = require('./pool')
 var multer =require('./multer')
 const upload =require('./multer')
 
-router.get('/fetch_all_category',function(req,res,next){
+router.post('/fetch_all_category',function(req,res,next){
     try
     {
-        pool.query("select categoryid,categoryname from category", function(error,result){
+        pool.query("select categoryid,categoryname from category where restaurantid=?",[req.body.restaurantid], function(error,result){
             if(error)
             {
                 res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
@@ -47,16 +47,16 @@ router.post('/submit_food_data',upload.single("icon"),function(req,res,next){
     //  console.log("hhh:",req.file)
     try
     { 
-        pool.query("insert into food(restaurantid,categoryid,subcategoryid,foodname,price,offerprice,ingredients,status,statustype,icon,createdat,updatedat) values(?,?,?,?,?,?,?,?,?,?,?,?)",[
+        pool.query("insert into food(restaurantid,categoryid,subcategoryid,foodname,statustype,price,offerprice,ingredients,status,icon,createdat,updatedat) values(?,?,?,?,?,?,?,?,?,?,?,?)",[
             req.body.restaurantid,
             req.body.categoryid,
             req.body.subcategoryid,
             req.body.foodname,
+            req.body.statustype,
             req.body.price,
             req.body.offerprice,
             req.body.ingredients,
             req.body.status,
-            req.body.statustype,
             req.file.filename,
             req.body.createdat,
             req.body.updatedat
@@ -77,10 +77,10 @@ router.post('/submit_food_data',upload.single("icon"),function(req,res,next){
             }
 })
 
-router.get('/fetch_all_food_data',function(req,res,next){
+router.post('/fetch_all_food_data',function(req,res,next){
     try
-    {
-        pool.query("select F.*,(select R.restaurantname from restaurant R where R.restaurantid=F.restaurantid)as restaurantname,(select C.categoryname from category C where C.categoryid=F.categoryid)as categoryname,(select S.subcategoryname from subcategory S where S.subcategoryid=F.subcategoryid)as subcategoryname from food F",function(error,result){
+    {console.log(req.body)
+        pool.query("select F.*,(select R.restaurantname from restaurant R where R.restaurantid=F.restaurantid)as restaurantname,(select C.categoryname from category C where C.categoryid=F.categoryid)as categoryname,(select S.subcategoryname from subcategory S where S.subcategoryid=F.subcategoryid)as subcategoryname from food F where F.restaurantid=?",[req.body.restaurantid],function(error,result){
             if(error)
                 { 
                   res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})

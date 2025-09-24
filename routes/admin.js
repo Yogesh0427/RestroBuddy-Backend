@@ -5,12 +5,19 @@ var pool=require('./pool.js')
 router.post('/check_admin_login', function (req, res, next) {
     // console.log("try:", req.body)
     try {
-      pool.query("select * from restaurantadmin where (emailid=? or mobile=?) and password=?",[req.body.emailid,req.body.emailid,req.body.password],function (error, result) {
+      pool.query("select * from restroadmin where (emailid=? or mobileno=?) and password=?",[req.body.emailid,req.body.emailid,req.body.password],function (error, result) {
         if (error) {
           res.status(500).json({ data: [], message: 'Database error, pls contact database administration.....', status: false })
         }
         else {
-          res.status(200).json({ data:result[0],message:'Successfull', status: true })
+              if(result.length==1)
+                {
+                  var {password,...data}=result[0]  
+                  //console.log("Selected Data:",data)
+                  res.status(200).json({data,message:'Successfull',status:true})
+                }
+              else
+                  res.status(200).json({data:[],message:'Invalid Adminid/Password',status:false})
         }
       })
     }

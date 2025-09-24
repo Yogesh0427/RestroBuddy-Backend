@@ -26,10 +26,10 @@ router.post('/edit_restaurent_timing',function(req,res,next){
         res.status(500).json({ data: [], message: 'Critical error, pls contact database administration.....', status: false })
       }
 })
-router.get('/display_all_time',function(req,res,next){
+router.post('/display_all_time',function(req,res,next){
   try
   {
-    pool.query("select T.*,(select R.restaurantname from restaurant R where R.restaurantid=T.restaurantid)as restaurantname from timing T",function(error,result){
+    pool.query("select T.*,(select R.restaurantname from restaurant R where R.restaurantid=T.restaurantid)as restaurantname from timing T where T.restaurantid=?",[req.body.restaurantid],function(error,result){
       if(error)
         {
             res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})

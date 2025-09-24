@@ -32,10 +32,10 @@ router.post('/submit_subcategory',upload.single("icon"),function(req,res,next){
               res.status(500).json({data:[],message:'Critical error, pls contact database administration.....',status:false})
             }
 })
-router.get('/fetch_all_category',function(req,res,next){
+router.post('/fetch_all_category',function(req,res,next){
   try
   {
-    pool.query("SELECT * FROM category;",function(error,result){
+    pool.query("SELECT * FROM category where restaurantid=?",[req.body.restaurantid],function(error,result){
       if(error)
         {
             res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
@@ -52,10 +52,10 @@ router.get('/fetch_all_category',function(req,res,next){
   }
 })
 
-router.get('/fetch_all_subcategory_data',function(req,res,next){
+router.post('/fetch_all_subcategory_data',function(req,res,next){
   try
   {
-    pool.query("select S.*,(select C.categoryname from category C where C.categoryid=S.categoryid)as categoryname,(select R.restaurantname from restaurant R where R.restaurantid=S.restaurantid)as restaurantname from subcategory S",function(error,result){
+    pool.query("select S.*,(select C.categoryname from category C where C.categoryid=S.categoryid)as categoryname,(select R.restaurantname from restaurant R where R.restaurantid=S.restaurantid)as restaurantname from subcategory S where S.restaurantid=?",[req.body.restaurantid],function(error,result){
       if(error)
         {
             res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
