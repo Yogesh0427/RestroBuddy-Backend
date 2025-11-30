@@ -1,11 +1,21 @@
 var mysql = require("mysql")
 var pool = mysql.createPool({
-    host: "sql102.infinityfree.com",
-    port: 3306,
-    user: "if0_40554941",
-    password: "EYUAvJbmaZkY347",
-    database: "if0_40554941_XXX",
+    host: "r1bk9t.h.filess.io",
+    port: 61002,
+    user: "Restrobuddy_ropethemby",
+    password: "f56fa0a700dfa072c7bfb6d21da48e6d170d58e9",
+    database: "Restrobuddy_ropethemby",
     multipleStatements: true,
     connectionLimit: 100,
 })
+
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.log("❌ MySQL Connection Failed:", err);
+  } else {
+    console.log("✅ MySQL Connected Successfully!");
+    connection.release();
+  }
+});
+
 module.exports = pool;
