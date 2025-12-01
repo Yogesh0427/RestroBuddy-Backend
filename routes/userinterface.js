@@ -40,9 +40,9 @@ router.post('/user_fetch_dininganddelivery_data',function(req,res){
     }
   try
   {
-    pool.query(`Select R.*,group_concat(Rp.pictures)as respic ,Ct.cityname,group_concat(C.categoryname)as categoryname,group_concat(C.icon)as catimg,T.status as resstatus,avg(Rv.restaurantrating)as restaurantrating from restaurant R left join restaurantpicture Rp on Rp.restaurantid=R.restaurantid and Rp.picturetype='Ambience' left join city Ct on Ct.cityid=R.cityid left join category C on C.restaurantid=R.restaurantid left join timing T on T.restaurantid=R.restaurantid left join review Rv on Rv.restaurantid=R.restaurantid where R.cityid=? ${filter==''? '':filter} group by R.restaurantid`,[req.body.cityid],function(error,result){
+    pool.query(`Select R.restaurantid,MAX(R.restaurantname) AS restaurantname,MAX(R.filelogo) AS filelogo,group_concat(Rp.pictures)as respic ,MAX(Ct.cityname) AS cityname,group_concat(C.categoryname)as categoryname,group_concat(C.icon)as catimg,MAX(T.status) AS resstatus,avg(Rv.restaurantrating)as restaurantrating from restaurant R left join restaurantpicture Rp on Rp.restaurantid=R.restaurantid and Rp.picturetype="Ambience" left join city Ct on Ct.cityid=R.cityid left join category C on C.restaurantid=R.restaurantid left join timing T on T.restaurantid=R.restaurantid left join review Rv on Rv.restaurantid=R.restaurantid where R.cityid=? ${filter==""? "":filter} group by R.restaurantid`,[req.body.cityid],function(error,result){
       if(error)
-      { 
+      { //console.log(error)
         res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
       }
       else
@@ -62,7 +62,7 @@ router.post('/user_fetch_restaurantdetails_data',function(req,res){
   {
     pool.query("Select R.*,count(distinct Rv.deliveryrating)as totaldeliveryrating,P.pictures as pictures,count(distinct Rv.dainingrating)as totaldainingrating,round(avg(Rv.deliveryrating), 1)as deliveryrating,round(avg(Rv.dainingrating), 1)as dainingrating, Ct.cityname,Ct.cityid,St.statename,group_concat(C.categoryname)as categoryname,group_concat(C.icon)as catimg,T.status as resstatus,T.opentime as opentime,T.closetime as closetime,round(avg(Rv.restaurantrating), 1)as restaurantrating,group_concat(subcategoryname)as subcategoryname from restaurant R left join city Ct on Ct.cityid=R.cityid left join restaurantpicture P on P.restaurantid=R.restaurantid and P.picturetype='Ambience' left join states St on St.stateid=R.stateid left join category C on C.restaurantid=R.restaurantid left join subcategory Sc on Sc.restaurantid=R.restaurantid left join timing T on T.restaurantid=R.restaurantid left join review Rv on Rv.restaurantid=R.restaurantid where R.restaurantid=? group by R.restaurantid",[req.body.restaurantid],function(error,result){
       if(error)
-      { 
+      { console.log(error)
         res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
       }
       else
@@ -148,7 +148,7 @@ router.post('/user_fetch_restaurantPictures_data',function(req,res){
   {
     pool.query(`select group_concat(pictures)as pictures from restaurantpicture where restaurantid=? ${req.body.picturetype? 'and picturetype=?':'' } group by restaurantid`,[req.body.restaurantid,req.body.picturetype],function(error,result){
       if(error)
-      { 
+      { console.log(error)
         res.status(500).json({data:[],message:'Database error, pls contact database administration.....',status:false})
       }
       else
